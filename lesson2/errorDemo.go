@@ -3,9 +3,8 @@ package lesson2
 import (
 	"database/sql"
 	"fmt"
-	"github.com/go-sql-driver/mysql"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
-	"github.com/pkg/errors"
 )
 
 /*
@@ -22,11 +21,10 @@ type Person struct {
 func SelectPolicy() {
 	var person []Person
 	err := Db.Select(&person, "select user_id, username, sex, email from person where user_id=?", 1)
-	switch err := errors.Cause(err).(type) {
-	case sql.ErrNoRows:
+	if err == sql.ErrNoRows {
 		fmt.Println("exec failed, ", err)
 		return
-	default:
+	} else {
 		panic("panic error!")
 	}
 	fmt.Println("select succ:", person)
@@ -43,5 +41,5 @@ func init() {
 	}
 
 	Db = database
-	defer db.Close() // 注意这行代码要写在上面err判断的下面
+	defer Db.Close() // 注意这行代码要写在上面err判断的下面
 }
